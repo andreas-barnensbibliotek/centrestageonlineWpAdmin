@@ -757,4 +757,105 @@ function twentytwenty_get_elements_array() {
 	* @param array Array of elements
 	*/
 	return apply_filters( 'twentytwenty_get_elements_array', $elements );
+
 }
+
+add_action( 'rest_api_init', 'wp_api_show_favorites_endpoints' );
+function wp_api_show_favorites_endpoints() {
+	register_rest_route( 'showFavorites', '/v2', array(
+		  'methods' => 'GET',
+		  'callback' => 'showFavorites_callback',
+	  ));
+}
+function showFavorites_callback( $request_data ) {
+	global $wpdb;
+	  $data = array();
+  
+	  $table        = 'wp_posts';
+	$parameters = $request_data->get_params();
+	$post_type = $parameters['post_type'];
+  
+	if($post_type!=''){
+		
+		$re_query     = "SELECT * FROM $table where post_type='content_en' and post_status='publish'";
+      $pre_results  = $wpdb->get_results($re_query,ARRAY_A);   
+      return $pre_results;
+
+	
+  
+	}else{
+		$data['status']=' false ';
+		return $data;
+  
+	} 
+  }
+
+  add_action( 'rest_api_init', 'wp_api_insertshow_favorites_endpoints' );
+  function wp_api_insertshow_favorites_endpoints() {
+	  register_rest_route( 'addpostrest', '/v2', array(
+			'methods' => 'POST',
+			'callback' => 'addpostrest_callback',
+		));
+  }
+  function addpostrest_callback( $request_data ) {
+	  global $wpdb;
+		$data = array();
+	
+		$table        = 'wp_posts';
+	  $parameters = $request_data->get_params();
+	  $post_type = $parameters['post_type'];
+	
+	  if($post_type!=''){
+		$wpdb->insert($table, array(
+			"post_type" => 'content_en',
+			"post_status" => 'publish',
+			"post_title" =>$parameters['post_title']
+			"post_name" => $parameters['post_namntype'],
+			"post_content" => $parameters['post_testtype'],			
+		 ));
+
+		 $re_query     = "SELECT * FROM $table where post_type='content_en' and post_status='publish'";
+		$pre_results  = $wpdb->get_results($re_query,ARRAY_A);   
+		return $pre_results;
+  
+	  
+	
+	  }else{
+		  $data['status']=' false ';
+		  return $data;
+	
+	  } 
+	}
+  
+
+
+add_action( 'rest_api_init', 'wp_api_postdata_endpoints' );
+function wp_api_postdata_endpoints() {
+	register_rest_route( 'postdata', '/v2', array(
+		  'methods' => 'POST',
+		  'callback' => 'postdata_callback',
+	  ));
+}
+function postdata_callback( $request_data ) {
+	global $wpdb;
+	  $data = array();
+  
+	  $table        = 'wp_posts';
+	$parameters = $request_data->get_params();
+	$post_type = $parameters['post_type'];
+	$post_namntype = $parameters['post_namntype'];
+	$post_testtype = $parameters['post_testtype'];
+  
+	if($post_type!=''){
+
+
+		
+		$data['status']= $parameters ;
+		return $data;
+  
+	}else{
+		$data['status']=' false ';
+		return $data;
+  
+	} 
+  }
