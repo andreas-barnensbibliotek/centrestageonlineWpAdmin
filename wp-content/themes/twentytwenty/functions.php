@@ -777,20 +777,21 @@ function showFavorites_callback( $request_data ) {
   
 	if($post_type!=''){
 		
-		$re_query     = "SELECT * FROM $table where post_type='content_en' and post_status='publish'";
+		$re_query     = "SELECT * FROM $table where post_type='registeruser'";
       $pre_results  = $wpdb->get_results($re_query,ARRAY_A);   
-      return $pre_results;
-
+    //    return $pre_results;
+	  $fname = get_field('gender', '50' );
 	
-  
+	  $data['status']=$fname;
+	  return $data;
 	}else{
 		$data['status']=' false ';
 		return $data;
   
 	} 
-  }
+}
 
-  add_action( 'rest_api_init', 'wp_api_insertshow_favorites_endpoints' );
+add_action( 'rest_api_init', 'wp_api_insertshow_favorites_endpoints' );
   function wp_api_insertshow_favorites_endpoints() {
 	  register_rest_route( 'addpostrest', '/v2', array(
 			'methods' => 'POST',
@@ -802,31 +803,37 @@ function showFavorites_callback( $request_data ) {
 		$data = array();
 	
 		$table        = 'wp_posts';
-	  $parameters = $request_data->get_params();
-	  $post_type = $parameters['post_type'];
+	  	$parameters = $request_data->get_params();	 
+	  	$post_type = $parameters['post_type'];
 	
 	  if($post_type!=''){
 		$wpdb->insert($table, array(
 			"post_type" => 'content_en',
 			"post_status" => 'publish',
-			"post_title" =>$parameters['post_title']
+			"post_title" =>$parameters['post_title'],
 			"post_name" => $parameters['post_namntype'],
-			"post_content" => $parameters['post_testtype'],			
-		 ));
+			"post_content" => $parameters['post_testtype'],	
+			
+		));
 
-		 $re_query     = "SELECT * FROM $table where post_type='content_en' and post_status='publish'";
+		$re_query     = "SELECT * FROM $table where post_type='content_en' and post_status='publish'";
 		$pre_results  = $wpdb->get_results($re_query,ARRAY_A);   
-		return $pre_results;
-  
-	  
+		$newid= $wpdb->insert_id;
+		add_post_meta( $newid, 'contentblock1', 'vanilla' );
+		// return $pre_results;
+  $data['test']= $newid;
+		$data['status']= $parameters;
+		return $data;
+		// return $pre_results;
 	
 	  }else{
-		  $data['status']=' false ';
+		  $data['status']=' false 1';
 		  return $data;
 	
 	  } 
 	}
   
+
 
 
 add_action( 'rest_api_init', 'wp_api_postdata_endpoints' );
@@ -850,11 +857,11 @@ function postdata_callback( $request_data ) {
 
 
 		
-		$data['status']= $parameters ;
+		$data['status']= $parameters;
 		return $data;
   
 	}else{
-		$data['status']=' false ';
+		$data['status']=' false 2';
 		return $data;
   
 	} 
