@@ -769,21 +769,21 @@ function wp_api_show_favorites_endpoints() {
 }
 function showFavorites_callback( $request_data ) {
 	global $wpdb;
-	  $data = array();
+	$data = array();
   
-	  $table        = 'wp_posts';
+	$table = 'wp_posts';
 	$parameters = $request_data->get_params();
 	$post_type = $parameters['post_type'];
   
 	if($post_type!=''){
 		
-		$re_query     = "SELECT * FROM $table where post_type='registeruser'";
-      $pre_results  = $wpdb->get_results($re_query,ARRAY_A);   
+		$re_query     = "SELECT * FROM $table where post_type='menu_en'";
+      	$pre_results  = $wpdb->get_results($re_query,ARRAY_A);   
     //    return $pre_results;
-	  $fname = get_field('gender', '50' );
+		$fname = get_field('link', '36' );
 	
-	  $data['status']=$fname;
-	  return $data;
+	  	$data['status']=$fname;
+	  	return $data;
 	}else{
 		$data['status']=' false ';
 		return $data;
@@ -791,37 +791,37 @@ function showFavorites_callback( $request_data ) {
 	} 
 }
 
-add_action( 'rest_api_init', 'wp_api_insertshow_favorites_endpoints' );
-  function wp_api_insertshow_favorites_endpoints() {
-	  register_rest_route( 'addpostrest', '/v2', array(
+// POST REGISTRERA ANVÄNDARE---------------------------
+add_action( 'rest_api_init', 'wp_api_insert_registration_user_endpoints' );
+  function wp_api_insert_registration_user_endpoints() {
+	  register_rest_route( 'addreg', '/v2', array(
 			'methods' => 'POST',
-			'callback' => 'addpostrest_callback',
+			'callback' => 'addRegisterUser_callback',
 		));
   }
-  function addpostrest_callback( $request_data ) {
+  function addRegisterUser_callback( $request_data ) {
 	  global $wpdb;
 		$data = array();
 	
-		$table        = 'wp_posts';
+		$table = 'wp_posts';
 	  	$parameters = $request_data->get_params();	 
 	  	$post_type = $parameters['post_type'];
 	
 	  if($post_type!=''){
 		$wpdb->insert($table, array(
-			"post_type" => 'content_en',
-			"post_status" => 'publish',
-			"post_title" =>$parameters['post_title'],
-			"post_name" => $parameters['post_namntype'],
-			"post_content" => $parameters['post_testtype'],	
-			
+			"post_type" => 'registeruser',
+			"post_status" => 'draft',
+			"post_title" =>$parameters['post_title'],				
 		));
 
-		$re_query     = "SELECT * FROM $table where post_type='content_en' and post_status='publish'";
+		$re_query     = "SELECT * FROM $table where post_type='registeruser' and post_status='draft'";
 		$pre_results  = $wpdb->get_results($re_query,ARRAY_A);   
 		$newid= $wpdb->insert_id;
-		add_post_meta( $newid, 'contentblock1', 'vanilla' );
+		add_post_meta( $newid, 'language', $parameters['language'] );
+		add_post_meta( $newid, 'gender', $parameters['gender'] );
+		add_post_meta( $newid, 'befattning', $parameters['befattning'] );
 		// return $pre_results;
-  $data['test']= $newid;
+  		$data['test']= $newid;
 		$data['status']= $parameters;
 		return $data;
 		// return $pre_results;
@@ -831,10 +831,49 @@ add_action( 'rest_api_init', 'wp_api_insertshow_favorites_endpoints' );
 		  return $data;
 	
 	  } 
-	}
-  
+	}	
 
+// POST REGISTRERA ANVÄNDARE test---------------------------
+add_action( 'rest_api_init', 'wp_api_insert_TEST_endpoints' );
+  function wp_api_insert_TEST_endpoints() {
+	  register_rest_route( 'addreg', '/v2', array(
+			'methods' => 'POST',
+			'callback' => 'wp_api_insert_TEST_callback',
+		));
+  }
+  function wp_api_insert_TEST_callback( $request_data ) {
+	  global $wpdb;
+		$data = array();
+	
+		$table = 'wp_posts';
+	  	$parameters = $request_data->get_params();	 
+	  	$post_type = $parameters['post_type'];
+	
+	  if($post_type!=''){
+		$wpdb->insert($table, array(
+			"post_type" => 'content_en',
+			"post_status" => 'publish',
+			"post_title" =>$parameters['post_title'],
+			"post_name" => $parameters['post_namntype'],
+			"post_content" => $parameters['post_testtype'],				
+		));
 
+		$re_query     = "SELECT * FROM $table where post_type='content_en' and post_status='publish'";
+		$pre_results  = $wpdb->get_results($re_query,ARRAY_A);   
+		$newid= $wpdb->insert_id;
+		add_post_meta( $newid, 'contentblock1', 'vanilla' );
+		// return $pre_results;
+  		$data['test']= $newid;
+		$data['status']= $parameters;
+		return $data;
+		// return $pre_results;
+	
+	  }else{
+		  $data['status']=' false 1';
+		  return $data;
+	
+	  } 
+	}	
 
 add_action( 'rest_api_init', 'wp_api_postdata_endpoints' );
 function wp_api_postdata_endpoints() {
@@ -845,24 +884,19 @@ function wp_api_postdata_endpoints() {
 }
 function postdata_callback( $request_data ) {
 	global $wpdb;
-	  $data = array();
+	$data = array();
   
-	  $table        = 'wp_posts';
+	$table = 'wp_posts';
 	$parameters = $request_data->get_params();
 	$post_type = $parameters['post_type'];
 	$post_namntype = $parameters['post_namntype'];
 	$post_testtype = $parameters['post_testtype'];
   
-	if($post_type!=''){
-
-
-		
+	if($post_type!=''){	
 		$data['status']= $parameters;
-		return $data;
-  
+		return $data;  
 	}else{
 		$data['status']=' false 2';
-		return $data;
-  
+		return $data;  
 	} 
   }
